@@ -1,0 +1,34 @@
+import json
+import time
+import random
+from datetime import datetime
+from azure.iot.device import IoTHubDeviceClient, Message
+
+# Azure IoT Hub connection string (replace with your own IoT Hub connection string)
+CONNECTION_STRING = "Your_IoT_Hub_Connection_String"
+
+# Create an IoT Hub client
+client = IoTHubDeviceClient.create_from_connection_string(CONNECTION_STRING)
+
+def generate_sensor_data(location):
+    return {
+        "location": location,
+        "iceThickness": random.randint(20, 40),  # Random ice thickness (in cm)
+        "surfaceTemperature": random.uniform(-10, 5),  # Random temperature
+        "snowAccumulation": random.randint(0, 20),  # Random snow accumulation
+        "externalTemperature": random.uniform(-15, 5),  # Random external temp
+        "timestamp": datetime.utcnow().isoformat() + "Z"
+    }
+
+def main():
+    locations = ["Dow's Lake", "Fifth Avenue", "NAC"]
+    while True:
+        for location in locations:
+            data = generate_sensor_data(location)
+            message = Message(json.dumps(data))
+            print(f"Sending message: {message}")
+            client.send_message(message)
+        time.sleep(10)  # Wait 10 seconds
+
+if __name__ == "__main__":
+    main()
